@@ -1,7 +1,6 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ImageHolder from '../../middleware/ImageHolder';
 import RgbController from '../../middleware/RgbController';
-import SizeController from '../../middleware/SizeController';
 import ExtraController from '../../middleware/ExtraController';
 import ExtraGlass from './ExtraGlass';
 import ExtraSizeController from '../../middleware/ExtraSizeController';
@@ -12,6 +11,7 @@ export default function ExtraContainer() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [glassPosition, setGlassPosition] = useState({ x: 0, y: 0 });
   const [rgbValue, setRgbValue] = useState({ r: 100, g: 100, b: 100 });
+  const [currectColor, setCurrentColor] = useState()
   const [lock, setLock] = useState(false);
   const [glassSize, setGlassSize] = useState(50);
   const [glassRadius, setGlassRadius] = useState(50);
@@ -20,7 +20,14 @@ export default function ExtraContainer() {
   const BORDER_WIDTH = 4
   const containerRef = useRef(null);
   const rangeRef = useRef(null);
-  const rangeInputRef = useRef(null);
+
+  useEffect(()=>{
+    document.addEventListener('keydown', handleArrowChange);
+
+    return () => {
+      document.removeEventListener('keydown', handleArrowChange);
+    };
+  },[currectColor])
 
 
   const handleMouseMove = (event) => {
@@ -79,6 +86,44 @@ export default function ExtraContainer() {
     setZoomValues(newValue);
   };
 
+  const handleArrowChange = (event) => {
+    if(event.key == 'r'){
+      setCurrentColor(event.key)
+    }
+    if(event.key == 'g'){
+      setCurrentColor(event.key)
+    }
+    if(event.key == 'b'){
+      setCurrentColor(event.key)
+    }
+    if (event.key == 'ArrowLeft' && currectColor == 'r' && rgbValue.r > 0){
+      const val = rgbValue.r -= 2
+      setRgbValue(prevValue => ({...prevValue, r: val}))
+    }
+    if (event.key == 'ArrowRight' && currectColor == 'r' && rgbValue.r < 200){
+      const val = rgbValue.r += 2
+      setRgbValue(preValue => ({...preValue, r: val }))
+    }
+
+    if (event.key == 'ArrowLeft' && currectColor == 'g' && rgbValue.g > 0){
+      const val = rgbValue.g -= 2
+      setRgbValue(preValue => ({...preValue, g: val }))
+    }
+    if (event.key == 'ArrowRight' && currectColor == 'g' && rgbValue.g < 200){
+      const val = rgbValue.g += 2
+      setRgbValue(preValue => ({...preValue, g: val }))
+    }
+
+    if (event.key == 'ArrowLeft' && currectColor == 'b' && rgbValue.b > 0){
+      const val = rgbValue.b -= 2
+      setRgbValue(preValue => ({...preValue, b: val }))
+    }
+    if (event.key == 'ArrowRight' && currectColor == 'b' && rgbValue.b < 200){
+      const val = rgbValue.b += 2
+      setRgbValue(preValue => ({...preValue, b: val }))
+    }
+  }
+
   function lockGlass(){
     setLock(!lock)
   }
@@ -95,7 +140,7 @@ export default function ExtraContainer() {
   return (
     <div className='main-container' ref={containerRef} onMouseMove={handleMouseMove} >
       <div className='image-container' onClick={lockGlass} onWheel={handleScroll} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-        <ImageHolder rgbValue={rgbValue}/>
+        <ImageHolder/>
         <ExtraGlass 
         cursorPosition={cursorPosition} 
         glassPosition={glassPosition}
@@ -113,7 +158,7 @@ export default function ExtraContainer() {
       <div className='extra-container' onChange={handleRangeChange}>
         < ExtraController glassRadius={glassRadius} glassSize={glassSize} zoomLevel={zoomLevel}/>
       </div>
-      <div className='rgb-container' ref={rangeInputRef} onChange={handleRangeChange}>
+      <div className='rgb-container' onChange={handleRangeChange} tabIndex={0} onKeyDown={handleArrowChange}>
         <RgbController rgbValue={rgbValue}/>
       </div>
       <div className='eventLayer'></div>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import MainGlass from './MainGlass'
 import ImageHolder from '../../middleware/ImageHolder';
 import RgbController from '../../middleware/RgbController';
@@ -10,13 +10,21 @@ export default function MainContainer() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [glassPosition, setGlassPosition] = useState({ x: 0, y: 0 });
   const [rgbValue, setRgbValue] = useState({ r: 100, g: 100, b: 100 });
+  const [currectColor, setCurrentColor] = useState()
   const [lock, setLock] = useState(false);
   const [mouseOver, setMouseOver] = useState(false)
   const BORDER_WIDTH = 4;
   const GLASS_RADIUS = 50;
   const containerRef = useRef(null);
   const rangeRef = useRef(null);
-  const rangeInputRef = useRef(null);
+
+  useEffect(()=>{
+    document.addEventListener('keydown', handleArrowChange);
+
+    return () => {
+      document.removeEventListener('keydown', handleArrowChange);
+    };
+  },[currectColor])
 
 
   const handleMouseMove = (event) => {
@@ -55,6 +63,7 @@ export default function MainContainer() {
   const handleRangeChange = (event) => {
     const value = event.target.value;
     const id = event.target.id
+    console.log(event.target.value)
     if (id === "zoomValue") setZoomValues(value)
     if (id === "red") setRgbValue(prevState => ({...prevState, r: value}))
     if (id === "green") setRgbValue(prevState => ({...prevState, g: value}))
@@ -69,6 +78,44 @@ export default function MainContainer() {
     rangeRef.current.value = newValue;
     setZoomValues(newValue);
   };
+
+  const handleArrowChange = (event) => {
+    if(event.key == 'r'){
+      setCurrentColor(event.key)
+    }
+    if(event.key == 'g'){
+      setCurrentColor(event.key)
+    }
+    if(event.key == 'b'){
+      setCurrentColor(event.key)
+    }
+    if (event.key == 'ArrowLeft' && currectColor == 'r' && rgbValue.r > 0){
+      const val = rgbValue.r -= 2
+      setRgbValue(prevValue => ({...prevValue, r: val}))
+    }
+    if (event.key == 'ArrowRight' && currectColor == 'r' && rgbValue.r < 200){
+      const val = rgbValue.r += 2
+      setRgbValue(preValue => ({...preValue, r: val }))
+    }
+
+    if (event.key == 'ArrowLeft' && currectColor == 'g' && rgbValue.g > 0){
+      const val = rgbValue.g -= 2
+      setRgbValue(preValue => ({...preValue, g: val }))
+    }
+    if (event.key == 'ArrowRight' && currectColor == 'g' && rgbValue.g < 200){
+      const val = rgbValue.g += 2
+      setRgbValue(preValue => ({...preValue, g: val }))
+    }
+
+    if (event.key == 'ArrowLeft' && currectColor == 'b' && rgbValue.b > 0){
+      const val = rgbValue.b -= 2
+      setRgbValue(preValue => ({...preValue, b: val }))
+    }
+    if (event.key == 'ArrowRight' && currectColor == 'b' && rgbValue.b < 200){
+      const val = rgbValue.b += 2
+      setRgbValue(preValue => ({...preValue, b: val }))
+    }
+  }
 
   function lockGlass(){
     setLock(!lock)
@@ -86,7 +133,7 @@ export default function MainContainer() {
   return (
     <div className='main-container' ref={containerRef} onMouseMove={handleMouseMove} >
       <div className='image-container' onClick={lockGlass} onWheel={handleScroll} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-        <ImageHolder rgbValue={rgbValue}/>
+        <ImageHolder/>
         <MainGlass 
         cursorPosition={cursorPosition} 
         glassPosition={glassPosition}
@@ -95,10 +142,10 @@ export default function MainContainer() {
         rgbValue={rgbValue}
         mouseOver={mouseOver}/>
       </div>
-      <div className='scale-container' ref={rangeRef} onChange={handleRangeChange} >
+      <div className='scale-container' ref={rangeRef} onChange={handleRangeChange}>
         <SizeController zoomValue={zoomValue}/>
       </div>
-      <div className='rgb-container' ref={rangeInputRef} onChange={handleRangeChange}>
+      <div className='rgb-container' onChange={handleRangeChange} tabIndex={0} onKeyDown={handleArrowChange}>
         <RgbController rgbValue={rgbValue}/>
       </div>
       <div className='eventLayer'></div>
