@@ -18,7 +18,7 @@ function App() {
   - hover over the image
   - click to fix the glass to a point on the image
   - zoom by scrolling
-  - press r, g, or b and adjust the values with the arrows
+  - press right and left arrow keys to adjust saturation value
   `
 
   const extraText = `
@@ -26,10 +26,11 @@ function App() {
   - hover over the image
   - click to fix the glass to a point on the image
   - zoom by scrolling
-  - press r, g, or b and adjust the values with the arrows
+  - press r, g, or b and adjust the rgb values by pressing the arrow keys
   - change the glass size
   - form the shape of the glass
   - adjust the maximum zoom level
+  - change the image quality between high and low (this might take some seconds)
   `
 
   return (

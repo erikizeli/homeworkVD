@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ImageHolder from '../../middleware/ImageHolder';
 import RgbController from '../../middleware/RgbController';
-import ExtraController from '../../middleware/ExtraController';
-import ExtraGlass from './ExtraGlass';
-import ExtraSizeController from '../../middleware/ExtraSizeController';
+import GlassAttributeController from '../../middleware/GlassAttributeController';
+import ExtraGlass from './ExtraMagnifyingGlass';
+import ExtraZoomController from '../../middleware/ExtraZoomController';
+import ImageQualityController from '../../middleware/ImageQualityController';
 
 export default function ExtraContainer() {
 
@@ -11,23 +12,24 @@ export default function ExtraContainer() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [glassPosition, setGlassPosition] = useState({ x: 0, y: 0 });
   const [rgbValue, setRgbValue] = useState({ r: 100, g: 100, b: 100 });
-  const [currectColor, setCurrentColor] = useState()
+  const [currentColor, setCurrentColor] = useState()
+  const [imageQuality, setImageQuality] = useState('lowQuality')
   const [lock, setLock] = useState(false);
   const [glassSize, setGlassSize] = useState(50);
   const [glassRadius, setGlassRadius] = useState(50);
   const [zoomLevel, setZoomLevel] = useState(10);
   const [mouseOver, setMouseOver] = useState(false)
   const BORDER_WIDTH = 4
+  const MILLISECOND_DELAY = 30;
   const containerRef = useRef(null);
-  const rangeRef = useRef(null);
 
   useEffect(()=>{
-    document.addEventListener('keydown', handleArrowChange);
+    document.addEventListener('keydown', handleArrowKey);
 
     return () => {
-      document.removeEventListener('keydown', handleArrowChange);
+      document.removeEventListener('keydown', handleArrowKey);
     };
-  },[currectColor])
+  },[currentColor])
 
 
   const handleMouseMove = (event) => {
@@ -56,18 +58,17 @@ export default function ExtraContainer() {
       lockedY = horizontalLockPoint;
     }
 
-    const delay = 30; // milliseconds
+
     setTimeout(() => {
       setGlassPosition({x: offsetX, y: offsetY})
       setCursorPosition({x: lockedX, y: lockedY})
-    }, delay);
+    }, MILLISECOND_DELAY);
   };
   
 
-  const handleRangeChange = (event) => {
+  const handleGlassValueChange = (event) => {
     const value = event.target.value;
     const id = event.target.id
-    console.log(value)
     if (id === "zoomValue") setZoomValues(value)
     if (id === "red") setRgbValue(prevState => ({...prevState, r: value}))
     if (id === "green") setRgbValue(prevState => ({...prevState, g: value}))
@@ -80,47 +81,60 @@ export default function ExtraContainer() {
   const handleScroll = (event) => {
     const scrollSensitivity = 1;
     const delta = event.deltaY < 0 ? -scrollSensitivity : scrollSensitivity;
-    const newValue = Math.max(1, Math.min(zoomLevel, zoomValue + delta));
+    const val = Number(zoomValue) + delta
+    const newValue = Math.max(1, Math.min(zoomLevel, val));
 
-    rangeRef.current.value = newValue;
     setZoomValues(newValue);
   };
 
-  const handleArrowChange = (event) => {
-    if(event.key == 'r'){
-      setCurrentColor(event.key)
+  const handleArrowKey = (event) => {
+    if(event.key == 'r' || event.key == 'R'){
+      if(currentColor == 'r'){
+        setCurrentColor(null)
+      } else {
+        setCurrentColor('r')
+      }
     }
-    if(event.key == 'g'){
-      setCurrentColor(event.key)
+    if(event.key == 'g' || event.key == 'G'){
+      if(currentColor == 'g'){
+        setCurrentColor(null)
+      } else {
+        setCurrentColor('g')
+      }
     }
-    if(event.key == 'b'){
-      setCurrentColor(event.key)
+    if(event.key == 'b' || event.key == 'B'){
+      if(currentColor == 'b'){
+        setCurrentColor(null)
+      } else {
+        setCurrentColor('b')
+      }
     }
-    if (event.key == 'ArrowLeft' && currectColor == 'r' && rgbValue.r > 0){
-      const val = rgbValue.r -= 2
-      setRgbValue(prevValue => ({...prevValue, r: val}))
+    if (currentColor == 'r'){
+      if (event.key == 'ArrowLeft' && rgbValue.r > 0) {
+        const val = rgbValue.r -= 2
+        setRgbValue(prevValue => ({...prevValue, r: val}))
+      } else if (event.key == 'ArrowRight' && rgbValue.r < 200) {
+        const val = rgbValue.r += 2
+        setRgbValue(preValue => ({...preValue, r: val }))
+      }
     }
-    if (event.key == 'ArrowRight' && currectColor == 'r' && rgbValue.r < 200){
-      const val = rgbValue.r += 2
-      setRgbValue(preValue => ({...preValue, r: val }))
+    if (currentColor == 'g'){
+      if (event.key == 'ArrowLeft' && rgbValue.g > 0) {
+        const val = rgbValue.g -= 2
+        setRgbValue(prevValue => ({...prevValue, g: val}))
+      } else if (event.key == 'ArrowRight' && rgbValue.g < 200) {
+        const val = rgbValue.g += 2
+        setRgbValue(preValue => ({...preValue, g: val }))
+      }
     }
-
-    if (event.key == 'ArrowLeft' && currectColor == 'g' && rgbValue.g > 0){
-      const val = rgbValue.g -= 2
-      setRgbValue(preValue => ({...preValue, g: val }))
-    }
-    if (event.key == 'ArrowRight' && currectColor == 'g' && rgbValue.g < 200){
-      const val = rgbValue.g += 2
-      setRgbValue(preValue => ({...preValue, g: val }))
-    }
-
-    if (event.key == 'ArrowLeft' && currectColor == 'b' && rgbValue.b > 0){
-      const val = rgbValue.b -= 2
-      setRgbValue(preValue => ({...preValue, b: val }))
-    }
-    if (event.key == 'ArrowRight' && currectColor == 'b' && rgbValue.b < 200){
-      const val = rgbValue.b += 2
-      setRgbValue(preValue => ({...preValue, b: val }))
+    if (currentColor == 'b'){
+      if (event.key == 'ArrowLeft' && rgbValue.b > 0) {
+        const val = rgbValue.b -= 2
+        setRgbValue(prevValue => ({...prevValue, b: val}))
+      } else if (event.key == 'ArrowRight' && rgbValue.b < 200) {
+        const val = rgbValue.b += 2
+        setRgbValue(preValue => ({...preValue, b: val }))
+      }
     }
   }
 
@@ -134,6 +148,10 @@ export default function ExtraContainer() {
 
   const handleMouseOut = () => {
     setMouseOver(false)
+  }
+
+  const handleImageQuality = (input) => {
+    setImageQuality(input)
   }
 
 
@@ -150,16 +168,19 @@ export default function ExtraContainer() {
         mouseOver={mouseOver}
         glassSize={glassSize}
         glassRadius={glassRadius}
-        zoomLevel={zoomLevel}/>
+        imageQuality={imageQuality}/>
       </div>
-      <div className='scale-container' ref={rangeRef} onChange={handleRangeChange} >
-        <ExtraSizeController zoomValue={zoomValue} zoomLevel={zoomLevel}/>
+      <div className='zoom-container' onChange={handleGlassValueChange} >
+        <ExtraZoomController zoomValue={zoomValue} zoomLevel={zoomLevel}/>
       </div>
-      <div className='extra-container' onChange={handleRangeChange}>
-        < ExtraController glassRadius={glassRadius} glassSize={glassSize} zoomLevel={zoomLevel}/>
+      <div className='extra-container' onChange={handleGlassValueChange}>
+        <GlassAttributeController glassRadius={glassRadius} glassSize={glassSize} zoomLevel={zoomLevel}/>
       </div>
-      <div className='rgb-container' onChange={handleRangeChange} tabIndex={0} onKeyDown={handleArrowChange}>
-        <RgbController rgbValue={rgbValue}/>
+      <div className='rgb-container' onChange={handleGlassValueChange} tabIndex={0} onKeyDown={handleArrowKey}>
+        <RgbController rgbValue={rgbValue} currentColor={currentColor}/>
+      </div>
+      <div className='quality-container'>
+        <ImageQualityController imageQuality={imageQuality} handleImageQuality={handleImageQuality}/>
       </div>
       <div className='eventLayer'></div>
     </div>

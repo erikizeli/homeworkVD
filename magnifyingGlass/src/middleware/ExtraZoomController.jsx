@@ -1,6 +1,4 @@
-import React from 'react'
-
-export default function ExtraSizeController({ zoomValue, zoomLevel }) {
+export default function ExtraZoomController({ zoomValue, zoomLevel }) {
   return (
     <>
       <label className='scale-label' htmlFor="size">Zoom</label>

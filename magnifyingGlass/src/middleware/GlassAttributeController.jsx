@@ -1,6 +1,4 @@
-import React, { useRef } from 'react'
-
-export default function ExtraController({ glassRadius, glassSize, zoomLevel }) {
+export default function GlassAttributeController({ glassRadius, glassSize, zoomLevel }) {
 
   return (
     <>

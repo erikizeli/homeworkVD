@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-export default function ExtraGlass({ 
-  cursorPosition, glassPosition, 
-  zoomValue, lock, 
-  rgbValue, mouseOver,
-  glassSize, glassRadius, 
-  zoomLevel 
-}) {
+export default function MainMagnifyingGlass({ cursorPosition, glassPosition, zoomValue, lock, saturation, mouseOver }) {
 
   const [lockedCursorPosition, setLockedCursorPosition] = useState(null);
   const [lockedGlassPosition, setLockedGlassPosition] = useState(null);
   const [display, setDisplay] = useState();
+
+
   
   useEffect(() => {
     if (!lock) {
@@ -30,15 +26,9 @@ export default function ExtraGlass({
     '--y': lock ? (lockedGlassPosition ? `${lockedGlassPosition.y}px` : null) : `${glassPosition.y}px`,
     'left': lock ? (lockedCursorPosition ? `${lockedCursorPosition.x}px` : null) : `${cursorPosition.x}px`,
     'top': lock ? (lockedCursorPosition ? `${lockedCursorPosition.y}px` : null) : `${cursorPosition.y}px`,
-    'filter':`saturate(${(rgbValue.r/100) * (rgbValue.g/100) * (rgbValue.b/100) * 100}%)`,
+    'filter':`saturate(${saturation}%)`,
     'display':display,
     '--m': zoomValue,
-    '--borderRadius': `${glassRadius}%`,
-    '--glassRadius': `${glassSize}px`,
   }
-  return (
-    <div className='main-glass'
-    style={styles}>
-    </div>
-  )
+  return <div className='magnifying-glass'style={styles}></div>
 }
