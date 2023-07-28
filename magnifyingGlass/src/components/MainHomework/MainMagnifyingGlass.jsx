@@ -6,7 +6,6 @@ export default function MainMagnifyingGlass({ cursorPosition, glassPosition, zoo
   const [lockedGlassPosition, setLockedGlassPosition] = useState(null);
   const [display, setDisplay] = useState();
 
-
   
   useEffect(() => {
     if (!lock) {

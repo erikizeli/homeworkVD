@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import MainMagnifyingGlass from './MainMagnifyingGlass'
 import ImageHolder from '../../middleware/ImageHolder';
-import RgbController from '../../middleware/RgbController';
 import ZoomController from '../../middleware/ZoomController';
 import SaturationController from '../../middleware/SaturationController';
 
@@ -11,7 +10,6 @@ export default function MainContainer() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [glassPosition, setGlassPosition] = useState({ x: 0, y: 0 });
   const [saturation, setSaturation] = useState(100);
-  const [currentColor, setCurrentColor] = useState()
   const [lock, setLock] = useState(false);
   const [mouseOver, setMouseOver] = useState(false)
   const BORDER_WIDTH = 4;
@@ -75,10 +73,10 @@ export default function MainContainer() {
 
   const handleArrowChange = (event) => {
     if (event.key == 'ArrowLeft' && saturation > 0) {
-      const val = saturation - 2
+      const val = Number(saturation) - 2
       setSaturation(val)
     } else if (event.key == 'ArrowRight' && saturation < 200) {
-      const val = saturation + 2
+      const val = Number(saturation) + 2
       setSaturation(val)
     }
   }
